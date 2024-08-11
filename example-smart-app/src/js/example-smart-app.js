@@ -7,6 +7,37 @@
       ret.reject();
     }
 
+    document.getElementById('submitObservation').addEventListener('click', function() {
+      let observationText = document.getElementById('freeTextObservation').value;
+      if (observationText) {
+        let newObservation = {
+          resourceType: "Observation",
+          status: "final",
+          code: {
+            text: "Free Text Observation"
+          },
+          valueString: observationText,
+          subject: {
+            reference: "Patient/" + patientId
+          },
+          effectiveDateTime: new Date().toISOString()
+        };
+
+        FHIR.oauth2.ready().then(client => {
+          client.create({
+            resourceType: "Observation",
+            body: newObservation
+          }).then(response => {
+            console.log("New observation added:", response);
+            alert("Observation added successfully!");
+          }).catch(error => {
+            console.error("Error adding observation:", error);
+            alert("Failed to add observation.");
+          });
+        });
+      }
+    });
+
     function onReady(smart)  {
       if (smart.hasOwnProperty('patient')) {
         var patient = smart.patient;
